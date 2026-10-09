@@ -32,6 +32,34 @@
   --info-light: #d1ecf1;
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --primary: #9fa8da;
+  --primary-light: #c5cae9;
+  --primary-dark: #7986cb;
+  --primary-text: #171717;
+  --secondary: #ffab40;
+  --secondary-light: #ffc46b;
+  --secondary-dark: #ef6c00;
+  --secondary-text: #171717;
+  --background: #121212;
+  --surface: #1e1e1e;
+  --text-primary: #eeeeee;
+  --text-secondary: #bdbdbd;
+  --border: #424242;
+  --border-light: #333333;
+  --border-focus: #616161;
+  --success: #81c784;
+  --success-light: #1b3320;
+  --warning: #ffb74d;
+  --warning-light: #3b2d16;
+  --error: #ef9a9a;
+  --error-light: #3b1f1f;
+  --info: #80deea;
+  --info-light: #17343a;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -289,13 +317,32 @@ section h3 {
 
 button {
   background-color: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border: none;
   padding: 6px 12px;
   font-size: 0.85rem;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+:root[data-theme="dark"] header {
+  background-color: #252b55;
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .icon-button,
+:root[data-theme="dark"] #logout-button {
+  color: #ffffff;
+}
+
+input {
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+input::placeholder {
+  color: var(--text-secondary);
 }
 
 /* Tooltip styles */
@@ -432,6 +479,16 @@ button {
   transform: translateY(0);
 }
 
+.cancel-btn {
+  background-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.confirm-btn {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
 .close-modal,
 .close-login-modal {
   position: absolute;
@@ -562,7 +619,7 @@ footer {
 .day-filter.active,
 .time-filter.active {
   background-color: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border-color: var(--primary-dark);
 }
 
@@ -570,7 +627,7 @@ footer {
 .day-filter:hover,
 .time-filter:hover {
   background-color: var(--primary-light);
-  color: white;
+  color: var(--primary-text);
 }
 
 .time-filters {
@@ -610,6 +667,11 @@ footer {
   .sidebar-filters {
     width: 100%;
   }
+
+  #user-controls {
+    position: static;
+    margin-top: 8px;
+  }
 }
 
 /* User controls in header */
@@ -617,6 +679,9 @@ footer {
   position: absolute;
   top: 10px;
   right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #user-status {

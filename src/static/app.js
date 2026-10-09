@@ -7,6 +7,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signup-form");
   const activityInput = document.getElementById("activity");
   const closeRegistrationModal = document.querySelector(".close-modal");
+  const themeToggle = document.getElementById("theme-toggle");
+
+  function setTheme(theme) {
+    const isDark = theme === "dark";
+    document.documentElement.dataset.theme = isDark ? "dark" : "light";
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.innerHTML = isDark
+      ? '<span aria-hidden="true">☀️</span><span>Light mode</span>'
+      : '<span aria-hidden="true">🌙</span><span>Dark mode</span>';
+  }
+
+  const savedTheme = localStorage.getItem("theme");
+  setTheme(savedTheme === "dark" ? "dark" : "light");
+
+  themeToggle.addEventListener("click", () => {
+    const theme =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem("theme", theme);
+    setTheme(theme);
+  });
 
   // Search and filter elements
   const searchInput = document.getElementById("activity-search");
@@ -693,16 +713,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
       document.body.appendChild(confirmDialog);
-
-      // Style the buttons
-      const cancelBtn = confirmDialog.querySelector("#cancel-button");
-      const confirmBtn = confirmDialog.querySelector("#confirm-button");
-
-      cancelBtn.style.backgroundColor = "#f1f1f1";
-      cancelBtn.style.color = "#333";
-
-      confirmBtn.style.backgroundColor = "#dc3545";
-      confirmBtn.style.color = "white";
     }
 
     // Set the message
