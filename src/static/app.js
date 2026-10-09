@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("activity-search");
   const searchButton = document.getElementById("search-button");
   const categoryFilters = document.querySelectorAll(".category-filter");
+  const difficultyFilters = document.querySelectorAll(".difficulty-filter");
   const dayFilters = document.querySelectorAll(".day-filter");
   const timeFilters = document.querySelectorAll(".time-filter");
 
@@ -53,10 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
     community: { label: "Community", color: "#fff3e0", textColor: "#e65100" },
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
+  const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
 
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
+  let currentDifficulty = "all";
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
@@ -445,6 +448,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // The All difficulty option shows activities without a specified level.
+      const difficulty =
+        typeof details.difficulty === "string" ? details.difficulty.trim() : "";
+      if (
+        (currentDifficulty === "all" && difficulty) ||
+        (currentDifficulty !== "all" && difficulty !== currentDifficulty)
+      ) {
+        return;
+      }
+
       // Apply weekend filter if selected
       if (currentTimeRange === "weekend" && details.schedule_details) {
         const activityDays = details.schedule_details.days;
@@ -525,6 +538,11 @@ document.addEventListener("DOMContentLoaded", () => {
         ${typeInfo.label}
       </span>
     `;
+    const difficulty =
+      typeof details.difficulty === "string" ? details.difficulty.trim() : "";
+    const difficultyHtml = difficultyLevels.includes(difficulty)
+      ? `<span class="difficulty-tag">${difficulty}</span>`
+      : "";
 
     // Create capacity indicator
     const capacityIndicator = `
@@ -541,6 +559,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     activityCard.innerHTML = `
       ${tagHtml}
+      ${difficultyHtml}
       <h4>${name}</h4>
       <p>${details.description}</p>
       <p class="tooltip">
@@ -631,6 +650,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Update current filter and display filtered activities
       currentFilter = button.dataset.category;
+      displayFilteredActivities();
+    });
+  });
+
+  difficultyFilters.forEach((button) => {
+    button.addEventListener("click", () => {
+      difficultyFilters.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+      currentDifficulty = button.dataset.difficulty;
       displayFilteredActivities();
     });
   });
