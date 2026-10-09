@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let sharedActivityLocated = false;
 
   // Authentication state
   let currentUser = null;
@@ -503,12 +504,89 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    if (!sharedActivityLocated && window.location.hash) {
+      const sharedCard = document.getElementById(window.location.hash.slice(1));
+      if (sharedCard && activitiesList.contains(sharedCard)) {
+        sharedCard.scrollIntoView({ block: "center" });
+        sharedCard.focus({ preventScroll: true });
+        sharedActivityLocated = true;
+      }
+    }
+  }
+
+  function createSharingControls(name, details, cardId) {
+    const activityUrl = new URL("/static/index.html", window.location.origin);
+    activityUrl.hash = cardId;
+    const url = activityUrl.href;
+    const text = `Check out ${name} at Mergington High School! ${details.description} Schedule: ${formatSchedule(details)}`;
+    const controls = document.createElement("div");
+    controls.className = "share-controls";
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", `Share ${name}`);
+
+    const label = document.createElement("span");
+    label.textContent = "Share:";
+    controls.appendChild(label);
+
+    const destinations = [
+      ["Facebook", `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`],
+      ["X", `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`],
+      ["WhatsApp", `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`],
+    ];
+
+    destinations.forEach(([platform, href]) => {
+      const link = document.createElement("a");
+      link.className = "share-button";
+      link.textContent = platform;
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.setAttribute("aria-label", `Share ${name} on ${platform} (opens in a new tab)`);
+      controls.appendChild(link);
+    });
+
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "share-button";
+    copyButton.textContent = "Copy link";
+    copyButton.setAttribute("aria-label", `Copy link to ${name}`);
+
+    const manualCopy = document.createElement("input");
+    manualCopy.type = "text";
+    manualCopy.className = "share-link-input";
+    manualCopy.readOnly = true;
+    manualCopy.hidden = true;
+    manualCopy.value = url;
+    manualCopy.setAttribute("aria-label", `Shareable link to ${name}`);
+
+    const status = document.createElement("span");
+    status.className = "share-status";
+    status.setAttribute("role", "status");
+
+    copyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        manualCopy.hidden = true;
+        status.textContent = "Link copied!";
+      } catch (error) {
+        manualCopy.hidden = false;
+        manualCopy.focus();
+        manualCopy.select();
+        status.textContent = "Copy the selected link to share this activity.";
+      }
+    });
+
+    controls.append(copyButton, manualCopy, status);
+    return controls;
   }
 
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    activityCard.id = `activity-${encodeURIComponent(name)}`;
+    activityCard.tabIndex = -1;
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -626,6 +704,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    activityCard.querySelector(".activity-card-actions").appendChild(
+      createSharingControls(name, details, activityCard.id)
+    );
     activitiesList.appendChild(activityCard);
   }
 
