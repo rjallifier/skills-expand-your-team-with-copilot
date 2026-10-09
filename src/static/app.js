@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     community: { label: "Community", color: "#fff3e0", textColor: "#e65100" },
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
+  const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
 
   // State for activities and filters
   let allActivities = {};
@@ -428,7 +429,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // The All difficulty option shows activities without a specified level.
-      const difficulty = details.difficulty?.trim();
+      const difficulty =
+        typeof details.difficulty === "string" ? details.difficulty.trim() : "";
       if (
         (currentDifficulty === "all" && difficulty) ||
         (currentDifficulty !== "all" && difficulty !== currentDifficulty)
@@ -516,8 +518,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ${typeInfo.label}
       </span>
     `;
-    const difficultyHtml = details.difficulty
-      ? `<span class="difficulty-tag">${details.difficulty}</span>`
+    const difficulty =
+      typeof details.difficulty === "string" ? details.difficulty.trim() : "";
+    const difficultyHtml = difficultyLevels.includes(difficulty)
+      ? `<span class="difficulty-tag">${difficulty}</span>`
       : "";
 
     // Create capacity indicator
